@@ -6,61 +6,207 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
+Laravel Multi-Tenant SaaS – User with Multiple Companies
+This is a minimal multi-tenant SaaS backend built with Laravel. Each authenticated user can create, manage, and switch between multiple companies under their account. All future actions and data will be scoped to the currently active company.
 
-## About Laravel
+✅ Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+User authentication (register, login, logout) via Sanctum
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Create, list, update, and delete companies under a user's account
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Switch between active companies
 
-## Learning Laravel
+Middleware to enforce active company for protected routes
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Clean Eloquent relationships and MySQL schema
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Proper validation and error handling
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+📁 Tech Stack
 
-## Laravel Sponsors
+Laravel 10+
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Sanctum for API authentication
 
-### Premium Partners
+MySQL
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+PHP 8.1+
 
-## Contributing
+Postman for testing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+📋 Prerequisites
 
-## Code of Conduct
+PHP 8.1 or higher
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Composer
 
-## Security Vulnerabilities
+MySQL
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Node.js and NPM (only if using frontend scaffolding)
 
-## License
+🚀 Setup Instructions
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Clone the Repository
+
+git clone https://github.com/your-username/laravel-multi-tenant-saas.git cd laravel-multi-tenant-saas
+
+Install Dependencies
+
+composer install npm install && npm run dev # Only if using Laravel Breeze or frontend scaffolding
+
+Create .env File
+
+cp .env.example .env
+
+Update the .env file with your database name, username, and password.
+
+Generate Application Key
+
+php artisan key:generate
+
+Run Migrations
+
+php artisan migrate
+
+Serve the Application
+
+php artisan serve
+
+API Base URL: http://127.0.0.1:8000/api
+
+🔐 Authentication Endpoints
+
+Method
+
+Endpoint
+
+Description
+
+POST
+
+/api/register
+
+Register new user
+
+POST
+
+/api/login
+
+Login user
+
+POST
+
+/api/logout
+
+Logout authenticated user (requires token)
+
+🏢 Company Endpoints
+
+Method
+
+Endpoint
+
+Description
+
+GET
+
+/api/companies
+
+List all companies of user
+
+POST
+
+/api/companies
+
+Create a new company
+
+PUT
+
+/api/companies/{id}
+
+Update company details
+
+DELETE
+
+/api/companies/{id}
+
+Delete (soft delete) a company
+
+POST
+
+/api/companies/{company_id}/switch
+
+Switch active company
+
+📌 All endpoints except login/register/logout require authentication.
+
+📬 Example API Requests (Postman or cURL)
+
+Create Company
+
+POST /api/companies { "name": "MyCompany", "address": "123 Market St", "industry": "IT" }
+
+Switch Active Company
+
+POST /api/companies/2/switch
+
+🧠 Multi-Tenant Logic & Data Scoping
+
+Every user can have multiple companies.
+
+The currently active company is tracked using the active_company_id field in the users table.
+
+Middleware (EnsureCompanySelected) enforces that users have an active company selected before accessing tenant-specific resources.
+
+Switching company sets the context for the rest of the session.
+
+Data isolation ensures users can only manage their own companies.
+
+📄 Database Schema Overview
+
+users
+
+id
+
+name
+
+email
+
+password
+
+active_company_id (nullable)
+
+timestamps
+
+companies
+
+id
+
+user_id (foreign key)
+
+name
+
+address
+
+industry
+
+timestamps
+
+deleted_at (for soft deletes)
+
+Optional: user_active_companies Table (Not used in this project)
+
+id (PK)
+
+user_id (FK to users)
+
+company_id (FK to companies)
+
+📬 Sample Company Payload
+
+{ "name": "Acme Corp", "address": "123 Main Street", "industry": "Software" }
+
+👨‍💼 Author
+
+Mahesh from The Tech WebGitHub: @thetechweb-mahesh
